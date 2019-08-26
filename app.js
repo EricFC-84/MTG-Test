@@ -12,8 +12,10 @@ const path = require('path')
 //Create server, get port and load password for token signature
 const server = express();
 const port = process.argv[2];
-const secrets = JSON.parse(fs.readFileSync("secrets.json"))
-path.join(__dirname, 'secrets.json')
+const secrets = JSON.parse(fs.readFileSync(path.join(__dirname, 'secrets.json')))
+const cardsJSON = JSON.parse(fs.readFileSync(path.join(__dirname, 'cards.json')))
+const usersJSON = JSON.parse(fs.readFileSync(path.join(__dirname, 'users.json')))
+
 
 //Middleware
 server.use(bodyParser.json())
@@ -28,7 +30,7 @@ server.use(cors()); // le pasamos el cors, que gestionará las cabeceras de sali
 //Endpoints
 
 server.get("/cards", (req, res) => {
-    let cards = fs.readFile("cards.json", (err, data) => {
+    let cards = fs.readFile(cardsJSON, (err, data) => {
         if (err) console.log(err)
         cards = JSON.parse(data)
         res.send(cards)
@@ -36,7 +38,7 @@ server.get("/cards", (req, res) => {
 })
 
 server.get("/card/:id", (req, res) => {
-    let cards = fs.readFile("cards.json", (err, data) => {
+    let cards = fs.readFile(cardsJSON, (err, data) => {
         if (err) console.log(err)
         cards = JSON.parse(data)
         let singleCard;
@@ -76,7 +78,7 @@ function checkCardData(cardData, cardList) {
 
 server.post("/cards", (req, res) => {
     let cardData = req.body;
-    fs.readFile("cards.json", (err, data) => {
+    fs.readFile(cardsJSON, (err, data) => {
         if (err) {
             console.log(err);
         }
@@ -91,7 +93,7 @@ server.post("/cards", (req, res) => {
             })
         } else {
             cardList.push(cardData);
-            fs.writeFile("cards.json", JSON.stringify(cardList), (err, data) => {
+            fs.writeFile(cardsJSON, JSON.stringify(cardList), (err, data) => {
                 console.log("Card added correctly.")
                 res.send({
                     "status": "OK",
@@ -106,7 +108,7 @@ server.post("/cards", (req, res) => {
 
 server.put("/card", (req, res) => {
     let cardData = req.body;
-    fs.readFile("cards.json", (err, data) => {
+    fs.readFile(cardsJSON, (err, data) => {
         if (err) {
             console.log(err);
         }
@@ -140,7 +142,7 @@ server.put("/card", (req, res) => {
                 for (let i = 0; i < keys.length; i++) {
                     cardList[cardToEditPosition][keys[i]] = cardData[keys[i]];
                 }
-                fs.writeFile("cards.json", JSON.stringify(cardList), (err, data) => {
+                fs.writeFile(cardsJSON, JSON.stringify(cardList), (err, data) => {
                     console.log("Card modified correctly.".yellow)
                     res.send({
                         "status": "OK",
@@ -163,7 +165,7 @@ server.post("/register", (req, res) => {
     //check body is correct
     if (req.body["username"] != undefined && req.body["username"] != "" && req.body["password"] != undefined && req.body["password"] != "") {
         //check if user is already registered
-        fs.readFile("users.json", (err, data) => {
+        fs.readFile(usersJSON, (err, data) => {
             if (err) {
                 console.log(err)
             }
@@ -186,7 +188,7 @@ server.post("/register", (req, res) => {
                         "username": req.body["username"],
                         "password": hash
                     })
-                    fs.writeFile("users.json", JSON.stringify(usersData), (err, data) => {
+                    fs.writeFile(usersJSON, JSON.stringify(usersData), (err, data) => {
                         console.log("User registered".green)
                         res.send({
                             "status": "OK",
@@ -206,7 +208,7 @@ server.post("/login", (req, res) => {
 
     if (req.body["username"] != undefined && req.body["username"] != "") {
         //check if username exists
-        fs.readFile("users.json", (err, data) => {
+        fs.readFile(usersJSON, (err, data) => {
             if (err) {
                 console.log(err)
             }
@@ -264,8 +266,8 @@ server.post("/login", (req, res) => {
 
 
 
-if (!fs.existsSync("users.json")) {
-    fs.writeFileSync("users.json", "[]");
+if (!fs.existsSync(usersJSON)) {
+    fs.writeFileSync(usersJSON, "[]");
 }
 
 
