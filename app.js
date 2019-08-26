@@ -7,12 +7,13 @@ const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const expressJWT = require("express-jwt")
 const cors = require('cors')
-
+const path = require('path')
 
 //Create server, get port and load password for token signature
 const server = express();
 const port = process.argv[2];
 const secrets = JSON.parse(fs.readFileSync("secrets.json"))
+path.join(__dirname, 'secrets.json')
 
 //Middleware
 server.use(bodyParser.json())
