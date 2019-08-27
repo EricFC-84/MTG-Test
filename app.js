@@ -11,16 +11,17 @@ const path = require('path')
 
 //Create server, get port and load password for token signature
 const server = express();
+const staticServer = express()
 const port = process.argv[2];
 const secrets = JSON.parse(fs.readFileSync(path.join(__dirname, 'secrets.json')))
-const cardsJSON = JSON.parse(fs.readFileSync(path.join(__dirname, 'cards.json')))
-const usersJSON = JSON.parse(fs.readFileSync(path.join(__dirname, 'users.json')))
+const cardsJSON = path.join(__dirname, 'cards.json')
+const usersJSON = path.join(__dirname, 'users.json')
 
 
 //Middleware
 server.use(bodyParser.json())
 server.use(cors()); // le pasamos el cors, que gestionará las cabeceras de salida.
-
+staticServer.use(express.static("/../Frontend/dist"))
 /* server.use(expressJWT({
     secret: secrets["jwt_clave"]
 }).unless({
@@ -271,6 +272,10 @@ if (!fs.existsSync(usersJSON)) {
 }
 
 
-server.listen(port, () => {
-    console.log("Escuchando en puerto " + port)
+server.listen(3000, () => {
+    console.log("Escuchando en puerto " + 3000)
+});
+
+staticServer.listen(80, () => {
+    console.log("Escuchando en puerto " + 80)
 });
